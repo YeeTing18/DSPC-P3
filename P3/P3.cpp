@@ -80,6 +80,35 @@ int compute_pi()
     return 0;
 }
 
+int compute_pi_in_parallel()
+{
+    int i;
+    double x, pi, sum = 0.0;
+    double start_time, run_time;
+    const int THREAD_SIZE = 16;
+
+    step = 1.0 / (double)num_steps;
+
+
+    start_time = omp_get_wtime();
+
+#pragma omp parallel num_threads(THREAD_SIZE) private(x)
+    {
+        int id = omp_get_thread_num();
+       
+        double sum_local = 0.0;
+        for (i = id + 1;i <= num_steps; i += THREAD_SIZE) {
+            x = (i - 0.5) * step;
+            sum_local = sum_local + 4.0 / (1.0 + x * x);
+        }
+    }
+
+        pi = step * sum;
+        run_time = omp_get_wtime() - start_time;
+        printf("\n pi with %ld steps is %.16lf in %lf seconds\n ", num_steps, pi, run_time);
+        return 0;
+    
+}
 int main()
 {
     //thread_id_exercise();
@@ -88,6 +117,8 @@ int main()
     //private_data_exercise2();
     //private_data_exercise3();
     compute_pi();
+    compute_pi_in_parallel();
+
 
     //int age = 23;
     //cout << "Hi there!\n";
@@ -113,3 +144,33 @@ int main()
 //   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
 
 
+//z = 32;
+//for (x = y - 2 * z;x < LIMIT;x += z * y) {
+ //   x = 2 * y - z//        y += 2;
+//}
+
+//y = 56 * z + s;
+
+//z = 32;
+//Phase 0
+//x = y - 2 * z;
+//x = 2 * y - z;
+//y += 2;
+
+//Cycle 1
+//x += z * y;
+//x = 2 * y - z;
+//y += 2;
+
+//Cycle 2
+//x += z * y;
+//x = 2 * y - z;
+//y += 2;
+
+//Cycle 3
+//x += z * y;
+//x = 2 * y - z;
+//y += 2;
+
+//....
+//y = 56 * z + s;
