@@ -82,32 +82,32 @@ int compute_pi()
 
 int compute_pi_in_parallel()
 {
-    int i;
-    double x, pi, sum = 0.0;
+    double pi, sum = 0.0;
     double start_time, run_time;
     const int THREAD_SIZE = 16;
+    double partial_sum[THREAD_SIZE] = {0.0};
 
     step = 1.0 / (double)num_steps;
-
-
     start_time = omp_get_wtime();
 
-#pragma omp parallel num_threads(THREAD_SIZE) private(x)
+    #pragma omp parallel num_threads(THREAD_SIZE)
     {
         int id = omp_get_thread_num();
-       
-        double sum_local = 0.0;
-        for (i = id + 1;i <= num_steps; i += THREAD_SIZE) {
+        int i;
+        double x;
+        for (i = id + 1;i <= num_steps; i +=THREAD_SIZE) {
             x = (i - 0.5) * step;
-            sum_local = sum_local + 4.0 / (1.0 + x * x);
+            partial_sum[id] += 4.0 / (1.0 + x * x); 
         }
     }
+    for (int i = 0; i < THREAD_SIZE; i++) {
+        sum += partial_sum[i];
+    }
 
-        pi = step * sum;
-        run_time = omp_get_wtime() - start_time;
-        printf("\n pi with %ld steps is %.16lf in %lf seconds\n ", num_steps, pi, run_time);
-        return 0;
-    
+    pi = step * sum;
+    run_time = omp_get_wtime() - start_time;
+    printf("\n pi with %ld steps is %.16lf in %lf seconds\n ", num_steps, pi, run_time);
+    return 0;
 }
 int main()
 {
