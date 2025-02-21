@@ -56,7 +56,7 @@ void private_data_exercise3() {
     printf("after: x is %d\n", x); //also dangerous
 }
 
-static long num_steps = 1000;
+static long num_steps = 100000000;
 double step;
 int compute_pi()
 {
@@ -101,6 +101,7 @@ int compute_pi_in_parallel()
         }
     }
     for (int i = 0; i < THREAD_SIZE; i++) {
+        //partial_sum[i] = 0.0;
         sum += partial_sum[i];
     }
 
